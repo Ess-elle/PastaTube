@@ -1,0 +1,29 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Standalone App",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/plugin/AudioPlugin_artefacts/Debug/Standalone/pluginname.exe", // Adjust the executable name if necessary
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "CMake Build Standalone"
+        },
+        {
+            "name": "Debug VST3",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/plugin/AudioPlugin_artefacts/Debug/VST3/pluginname.vst3/Contents/x86_64-win/pluginname.vst3",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "externalTerminal",
+            "preLaunchTask": "CMake Build",
+        }
+    ]
+}
