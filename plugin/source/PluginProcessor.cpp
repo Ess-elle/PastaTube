@@ -12,6 +12,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                      #endif
                        )
 {
+    addParameter (gain = new juce::AudioParameterFloat ("gain", "Gain", 0.0f, 1.0f, 0.5f));
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -150,7 +151,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         auto* channelData = buffer.getWritePointer (channel);
         
         for (int i = 0; i < buffer.getNumSamples(); ++i)
-            channelData[i] *= 0.1f;
+            channelData[i] *= (*gain);
     }
 }
 
@@ -162,7 +163,7 @@ bool AudioPluginAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor()
 {
-    return new AudioPluginAudioProcessorEditor (*this);
+    return new juce::GenericAudioProcessorEditor (*this);
 }
 
 //==============================================================================
