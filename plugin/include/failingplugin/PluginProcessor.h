@@ -3,6 +3,7 @@
 #include <juce_audio_processors/juce_audio_processors.h>
 
 //==============================================================================
+//AUDIO PROCESSOR
 class AudioPluginAudioProcessor final : public juce::AudioProcessor
 {
 public:
@@ -44,8 +45,7 @@ public:
 
 private:
     //==============================================================================
-    juce::AudioParameterFloat* gain;
-    
-    //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
+    juce::AudioParameterFloat* gain; //store audio parameter member
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };

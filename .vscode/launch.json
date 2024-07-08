@@ -5,7 +5,7 @@
             "name": "Debug Standalone App",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/plugin/AudioPlugin_artefacts/Debug/Standalone/pluginname.exe", // Adjust the executable name if necessary
+            "program": "${workspaceFolder}/build/plugin/AudioPlugin_artefacts/Debug/Standalone/failingplugin.exe", // Adjust the executable name if necessary
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
