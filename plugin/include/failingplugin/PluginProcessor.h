@@ -11,6 +11,9 @@ public:
     AudioPluginAudioProcessor();
     ~AudioPluginAudioProcessor() override;
 
+    //APVTA for parameters
+    juce::AudioProcessorValueTreeState parameters;
+
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -45,7 +48,6 @@ public:
 
 private:
     //==============================================================================
-    juce::AudioParameterFloat* gain; //store audio parameter member
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AudioPluginAudioProcessor)
 };

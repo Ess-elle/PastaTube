@@ -6,8 +6,15 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     : AudioProcessorEditor (&p), processorRef (p)
 {
     juce::ignoreUnused (processorRef);
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
+    // Make sure that before the constructor has finished, you've set the editor's size to whatever you need it to be.
+   
+    gainSlider.setSliderStyle(juce::Slider::LinearVertical);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60,20);
+    addAndMakeVisible(gainSlider);
+
+    //attach the slider to the parameter
+    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "gain", gainSlider);
+
     setSize (400, 300);
 }
 
@@ -29,9 +36,18 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.setColour (palePinkPeach);
     juce::Rectangle<float> backgroundRect = getLocalBounds().toFloat();
     int numWaves = 60;
-    float waveAmplitude = 20.0f;
+
+    // Retrieve the gain value from the processor
+    auto* gainParameter = processorRef.parameters.getRawParameterValue("gain");
+    float gainInDecibels = gainParameter->load();
+    float gainLinear = juce::Decibels::decibelsToGain(gainInDecibels);
+
+    // Use the gain value to adjust the wave amplitude
+    float waveAmplitude = 20.0f * gainLinear;
+
     float waveFrequency = 0.05f;
     float lineThickness = 10.0f;
+
 
      for (int i = 0; i < numWaves; ++i)
     {
@@ -72,4 +88,5 @@ void AudioPluginAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+    gainSlider.setBounds (40, 30, 20, getHeight() - 60);
 }
