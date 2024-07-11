@@ -5,7 +5,6 @@
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
     : AudioProcessorEditor (&p), processorRef (p)
 {
-    juce::ignoreUnused (processorRef);
     // Make sure that before the constructor has finished, you've set the editor's size to whatever you need it to be.
    
     gainSlider.setSliderStyle(juce::Slider::LinearVertical);
@@ -15,11 +14,16 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     //attach the slider to the parameter
     gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "gain", gainSlider);
 
+    // Add listener to the slider
+    gainSlider.addListener (this);
+
     setSize (400, 300);
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
+   // Remove the listener when the editor is destroyed
+    gainSlider.removeListener(this);
 }
 
 //==============================================================================
@@ -89,4 +93,13 @@ void AudioPluginAudioProcessorEditor::resized()
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
     gainSlider.setBounds (40, 30, 20, getHeight() - 60);
+}
+
+void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
+{
+    if (slider == &gainSlider)
+    {
+        // Force a repaint whenever the slider value changes
+        repaint();
+    }
 }

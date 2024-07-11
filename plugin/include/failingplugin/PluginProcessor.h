@@ -11,9 +11,6 @@ public:
     AudioPluginAudioProcessor();
     ~AudioPluginAudioProcessor() override;
 
-    //APVTA for parameters
-    juce::AudioProcessorValueTreeState parameters;
-
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -45,6 +42,10 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    //==============================================================================
+    
+    //APVTA for parameters
+    juce::AudioProcessorValueTreeState parameters;
 
 private:
     //==============================================================================
