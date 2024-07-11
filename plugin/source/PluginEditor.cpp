@@ -8,7 +8,11 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // Make sure that before the constructor has finished, you've set the editor's size to whatever you need it to be.
    
     gainSlider.setSliderStyle(juce::Slider::LinearVertical);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 60,20);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 50); //width, height
+    gainSlider.setRange(-60.0, 12.0); // Set the range in decibels
+    gainSlider.setSkewFactor(0.0); // ??
+    gainSlider.setNumDecimalPlacesToDisplay(1); // Display one decimal place
+    gainSlider.setTextValueSuffix(" dB"); // Add " dB" suffix to the value
     addAndMakeVisible(gainSlider);
 
     //attach the slider to the parameter
@@ -48,7 +52,6 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
     // Use the gain value to adjust the wave amplitude
     float waveAmplitude = 20.0f * gainLinear;
-
     float waveFrequency = 0.05f;
     float lineThickness = 10.0f;
 
@@ -66,25 +69,18 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
         g.strokePath (wavePath, juce::PathStrokeType (lineThickness));
     }
-
-     // Determine the text area
-    juce::Rectangle<int> textArea = getLocalBounds();
-    textArea = textArea.withSizeKeepingCentre(textArea.getWidth() / 2, textArea.getHeight() / 4);
-    textArea.setY(10); // Align to the top
-
-    // Fill the background for the text
+    
+    // Set the text area to a fixed size and position
+    juce::Rectangle<int> textArea (20, 20, getWidth() - 60, 50);
     g.setColour(backgroundColour);
-    g.fillRect(textArea);
-
-    // Draw the text
-    g.setColour(textColour);
+    g.fillRoundedRectangle(textArea.toFloat(), 10.0f); // Fill rounded rectangle with 10 pixel corner radius
+    
     juce::Font font;
     font.setHeight(24.0f); // Set the desired font size
     font.setBold(true);
     g.setFont(font);
-    textArea = textArea.withSizeKeepingCentre(textArea.getWidth() / 2, textArea.getHeight() / 4);
-    textArea.setY(20); // Align to the top
 
+    g.setColour(textColour);
     g.drawFittedText("esselleAudio", textArea, juce::Justification::centred, 1);
 }
 
@@ -92,7 +88,7 @@ void AudioPluginAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    gainSlider.setBounds (40, 30, 20, getHeight() - 60);
+    gainSlider.setBounds (40, 30, 100, getHeight() - 60); // x, y, width, height
 }
 
 void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)

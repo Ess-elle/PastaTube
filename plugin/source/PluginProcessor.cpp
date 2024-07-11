@@ -14,7 +14,7 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                      #endif
                        ), parameters(*this, nullptr, juce::Identifier("parameters"),
      {
-        std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 1.0f, 0.5f),
+        std::make_unique<juce::AudioParameterFloat>("gain", "Gain", -60.0f, 12.0f, 0.0f),
      })
 
 {
@@ -146,13 +146,8 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // this code if your algorithm always overwrites all the output channels.
 
     auto* gainParameter = parameters.getRawParameterValue("gain");
-    float currentGain = gainParameter->load();
-
-    //Figure our deibelsToGain and gainInDecibels
-    //float gainInLinear = juce::Decibels::decibelsToGain(gainInDecibels);
-    // Convert the gain in decibels to a linear gain factor using decibelsToGain.
-
-    // This function ensures that the gain change is applied logarithmically.
+    float gainInDecibels = gainParameter->load();
+    float gainInLinear = juce::Decibels::decibelsToGain(gainInDecibels);
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
@@ -168,7 +163,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         auto* channelData = buffer.getWritePointer (channel);
         
         for (int i = 0; i < buffer.getNumSamples(); ++i)
-            channelData[i] *= currentGain;
+            channelData[i] *= gainInLinear;
     }
 }
 
