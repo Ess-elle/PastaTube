@@ -22,10 +22,16 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     gainSlider.addListener (this);
 
     setSize (400, 300);
+
+    // Start the timer for animation
+    startTimerHz(60); // 60 frames per second
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
+   // Stop the timer when the editor is destroyed
+    stopTimer();
+   
    // Remove the listener when the editor is destroyed
     gainSlider.removeListener(this);
 }
@@ -55,6 +61,7 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     float waveFrequency = 0.05f;
     float lineThickness = 10.0f;
 
+    float phaseShift = animationPhase;
 
      for (int i = 0; i < numWaves; ++i)
     {
@@ -63,7 +70,7 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
         for (float x = backgroundRect.getX(); x < backgroundRect.getRight(); x += 1.0f)
         {
-            float y = backgroundRect.getY() + i * waveAmplitude + std::sin(x * waveFrequency) * waveAmplitude;
+            float y = backgroundRect.getY() + i * waveAmplitude + std::sin(x * waveFrequency + phaseShift) * waveAmplitude;
             wavePath.lineTo (x, y);
         }
 
@@ -98,4 +105,11 @@ void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
         // Force a repaint whenever the slider value changes
         repaint();
     }
+}
+
+void AudioPluginAudioProcessorEditor::timerCallback()
+{
+    // Update the phase for the sine wave animation
+    animationPhase += 0.1f;
+    repaint();
 }

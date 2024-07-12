@@ -5,7 +5,9 @@
 #include "juce_gui_basics/juce_gui_basics.h"
 
 //==============================================================================
-class AudioPluginAudioProcessorEditor final : public juce::AudioProcessorEditor, public juce::Slider::Listener
+class AudioPluginAudioProcessorEditor : public juce::AudioProcessorEditor, 
+                                        public juce::Slider::Listener,
+                                        private juce::Timer
 {
 public:
     explicit AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor&);
@@ -24,6 +26,9 @@ private:
     AudioPluginAudioProcessor& processorRef;
     juce::Slider gainSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
-    
+
+    void timerCallback() override;
+    float animationPhase = 0.0f;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };
