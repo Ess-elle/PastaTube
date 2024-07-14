@@ -16,6 +16,34 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     gainSlider.setTextValueSuffix(" dB"); // Add " dB" suffix to the value
     addAndMakeVisible(gainSlider);
 
+    delaySlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    delaySlider.setRange(0.0, 2000.0); // Example range from 0 ms to 2000 ms
+    delaySlider.setValue(500.0); // Set initial value
+    delaySlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 20);
+    addAndMakeVisible(delaySlider);
+
+    // Initialize and configure delayLabel
+    delayLabel.setText("Delay Time", juce::dontSendNotification);
+    delayLabel.setFont(juce::Font(15.0f, juce::Font::bold));
+    delayLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
+    delayLabel.attachToComponent(&delaySlider, true);
+    delayLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(delayLabel);
+
+    juce::ComboBox delayComboBox;
+    delayComboBox.addItem("100 ms", 1);
+    delayComboBox.addItem("250 ms", 2);
+    delayComboBox.addItem("500 ms", 3);
+    delayComboBox.addItem("1000 ms", 4);
+    delayComboBox.setSelectedId(3); // Set initial selection
+    addAndMakeVisible(delayComboBox);
+
+    juce::TextEditor delayTextEditor;
+    delayTextEditor.setText("500");
+    delayTextEditor.setInputRestrictions(4, "0123456789"); // Restrict input to numbers only
+    addAndMakeVisible(delayTextEditor);
+
+
         // Change slider colors
     gainSlider.setColour(juce::Slider::trackColourId, juce::Colours::palevioletred);
     gainSlider.setColour(juce::Slider::thumbColourId, juce::Colours::mediumvioletred);
@@ -121,6 +149,10 @@ void AudioPluginAudioProcessorEditor::resized()
 
     gainSlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
 
+    sliderX += sliderWidth + 50; // Add some space between sliders
+
+    delaySlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
+
     // Center the gainLabel with the gainSlider
     int labelWidth = gainSlider.getWidth();
     int labelHeight = 20; // Height of the label
@@ -128,6 +160,7 @@ void AudioPluginAudioProcessorEditor::resized()
     int labelY = sliderY - labelHeight - 5; // Position it above the slider with a 5 pixel gap
 
     gainLabel.setBounds(labelX, labelY, labelWidth, labelHeight);
+    
 }
 
 void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)

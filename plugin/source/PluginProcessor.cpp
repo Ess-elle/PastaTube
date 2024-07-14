@@ -15,6 +15,8 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                        ), parameters(*this, nullptr, juce::Identifier("parameters"),
      {
         std::make_unique<juce::AudioParameterFloat>("gain", "Gain", -60.0f, 12.0f, 0.0f),
+        std::make_unique<juce::AudioParameterFloat>("feedback", "Delay Feedback", 0.0f, 1.0f, 0.35f),
+        std::make_unique<juce::AudioParameterFloat>("mix", "Dry / Wet", 0.0f, 1.0f, 0.5f),
      })
 
 {
@@ -96,7 +98,11 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    int delayMilliseconds = 200;
+    auto delaySamples =(int) std::round (sampleRate * delayMilliseconds / 1000.0);
+    delayBuffer.setSize (2, delaySamples);
+    delayBuffer.clear();
+    delayBufferPos = 0;
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -145,10 +151,6 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
 
-    auto* gainParameter = parameters.getRawParameterValue("gain");
-    float gainInDecibels = gainParameter->load();
-    float gainInLinear = juce::Decibels::decibelsToGain(gainInDecibels);
-
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
@@ -158,13 +160,46 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // the samples and the outer loop is handling the channels.
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
+
+    auto* gainParameter = parameters.getRawParameterValue("gain");
+    auto* feedbackParameter = parameters.getRawParameterValue("feedback");
+    auto* mixParameter = parameters.getRawParameterValue("mix");
+
+    // Retrieve the parameter values
+    float gainInDecibels = gainParameter->load();
+    float feedback = feedbackParameter->load();
+    float mix = mixParameter->load();
+
+    // Convert the gain from decibels to linear
+    float gainInLinear = juce::Decibels::decibelsToGain(gainInDecibels);
+    
+    int delayBufferSize = delayBuffer.getNumSamples();
+ 
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-        
+        float* channelData = buffer.getWritePointer (channel);
+        int delayPos = delayBufferPos;
+
         for (int i = 0; i < buffer.getNumSamples(); ++i)
+        {
+            float drySample = channelData[i];
+
+            float delaySample = delayBuffer.getSample (channel, delayPos) * feedback;
+            delayBuffer.setSample (channel, delayPos, drySample + delaySample);
+
+            delayPos++;
+            if (delayPos == delayBufferSize)
+                delayPos = 0;
+
+            channelData[i] = (drySample * (1.0f - mix)) + (delaySample * mix);
             channelData[i] *= gainInLinear;
+        }
     }
+
+    delayBufferPos += buffer.getNumSamples();
+    if (delayBufferPos >= delayBufferSize)
+        delayBufferPos -= delayBufferSize;
+
 }
 
 //==============================================================================

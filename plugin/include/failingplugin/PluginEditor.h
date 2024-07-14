@@ -23,9 +23,14 @@ private:
     // access the processor object that created it.
     
     AudioPluginAudioProcessor& processorRef;
-    juce::Slider gainSlider;
+    juce::Slider gainSlider, delaySlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
-    juce::Label gainLabel;
+    juce::Label gainLabel, delayLabel;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delaySliderAttachment;
+
+    juce::ComboBox delayComboBox;
+    juce::TextEditor delayTextEditor;
+    
     
     // Implement the slider listener method
     void sliderValueChanged(juce::Slider* slider) override;
