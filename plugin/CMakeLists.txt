@@ -22,8 +22,10 @@ target_sources(${PROJECT_NAME}
     PRIVATE
     source/PluginEditor.cpp
     source/PluginProcessor.cpp
+    source/CustomLookAndFeel.cpp    
     ${INCLUDE_DIR}/PluginEditor.h
     ${INCLUDE_DIR}/PluginProcessor.h
+    ${INCLUDE_DIR}/CustomLookAndFeel.h
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -34,6 +36,13 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         juce::juce_audio_utils
+        juce::juce_core
+        juce::juce_data_structures
+        juce::juce_dsp
+        juce::juce_events
+        juce::juce_graphics
+        juce::juce_gui_basics
+        juce::juce_gui_extra
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
@@ -64,8 +73,10 @@ target_sources(${PROJECT_NAME}_Standalone
     PRIVATE
     source/PluginEditor.cpp
     source/PluginProcessor.cpp
+    source/CustomLookAndFeel.cpp
     ${INCLUDE_DIR}/PluginEditor.h
     ${INCLUDE_DIR}/PluginProcessor.h
+    ${INCLUDE_DIR}/CustomLookAndFeel.h
 )
 
 target_include_directories(${PROJECT_NAME}_Standalone

@@ -8,63 +8,79 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // Make sure that before the constructor has finished, you've set the editor's size to whatever you need it to be.
     setSize (400, 300);
 
-    gainSlider.setSliderStyle(juce::Slider::LinearVertical);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40); //width, height
-    gainSlider.setRange(-60.0, 12.0); // Set the range in decibels
-    gainSlider.setSkewFactor(0.0); // ??
-    gainSlider.setNumDecimalPlacesToDisplay(1); // Display one decimal place
-    gainSlider.setTextValueSuffix(" dB"); // Add " dB" suffix to the value
+    // Create an instance of the custom LookAndFeel
+    customLookAndFeel = std::make_unique<CustomLookAndFeel>();
+
+    // Initialize gainSlider
+    gainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
+    gainSlider.setRange(-60.0, 12.0);
+    gainSlider.setValue(0.0);
+    gainSlider.setTextValueSuffix(" dB");
+    gainSlider.setNumDecimalPlacesToDisplay(1);
+    gainSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    gainSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
+    gainSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
     addAndMakeVisible(gainSlider);
 
-    delaySlider.setSliderStyle(juce::Slider::LinearHorizontal);
-    delaySlider.setRange(0.0, 2000.0); // Example range from 0 ms to 2000 ms
-    delaySlider.setValue(500.0); // Set initial value
-    delaySlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 80, 20);
-    addAndMakeVisible(delaySlider);
+    // Initialize feedbackSlider
+    feedbackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    feedbackSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
+    feedbackSlider.setRange(0.0, 1.0);
+    feedbackSlider.setValue(0.35);
+    feedbackSlider.setNumDecimalPlacesToDisplay(2);
+    feedbackSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    feedbackSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
+    feedbackSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
+    addAndMakeVisible(feedbackSlider);
 
-    // Initialize and configure delayLabel
-    delayLabel.setText("Delay Time", juce::dontSendNotification);
-    delayLabel.setFont(juce::Font(15.0f, juce::Font::bold));
-    delayLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
-    delayLabel.attachToComponent(&delaySlider, true);
-    delayLabel.setJustificationType(juce::Justification::centred);
-    addAndMakeVisible(delayLabel);
+    // Initialize mixSlider
+    mixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    mixSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
+    mixSlider.setRange(0.0, 1.0);
+    mixSlider.setValue(0.5);
+    mixSlider.setNumDecimalPlacesToDisplay(2);
+    mixSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    mixSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
+    mixSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
+    addAndMakeVisible(mixSlider);
 
-    juce::ComboBox delayComboBox;
-    delayComboBox.addItem("100 ms", 1);
-    delayComboBox.addItem("250 ms", 2);
-    delayComboBox.addItem("500 ms", 3);
-    delayComboBox.addItem("1000 ms", 4);
-    delayComboBox.setSelectedId(3); // Set initial selection
-    addAndMakeVisible(delayComboBox);
+    //attach the slider to the parameter
+    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "gain", gainSlider);
+    feedbackSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "feedback", feedbackSlider);
+    mixSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "mix", mixSlider);
 
-    juce::TextEditor delayTextEditor;
-    delayTextEditor.setText("500");
-    delayTextEditor.setInputRestrictions(4, "0123456789"); // Restrict input to numbers only
-    addAndMakeVisible(delayTextEditor);
-
-
-        // Change slider colors
-    gainSlider.setColour(juce::Slider::trackColourId, juce::Colours::palevioletred);
-    gainSlider.setColour(juce::Slider::thumbColourId, juce::Colours::mediumvioletred);
-    gainSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::grey); // Change text color
-    gainSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::lightgrey); // Change text box background color
-
-    // Initialize the gain label
+    // Initialize the labels
     gainLabel.setText("Gain", juce::dontSendNotification);
     gainLabel.setFont(juce::Font(15.0f, juce::Font::bold));
     gainLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
     gainLabel.attachToComponent(&gainSlider, false);
     gainLabel.setJustificationType(juce::Justification::centred);
+    gainLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
+    gainLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
     addAndMakeVisible(gainLabel);
 
-    //attach the slider to the parameter
-    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "gain", gainSlider);
+    feedbackLabel.setText("Feedback", juce::dontSendNotification);
+    feedbackLabel.setFont(juce::Font(15.0f, juce::Font::bold));
+    feedbackLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
+    feedbackLabel.attachToComponent(&feedbackSlider, false);
+    feedbackLabel.setJustificationType(juce::Justification::centred);
+    feedbackLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
+    feedbackLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
+    addAndMakeVisible(feedbackLabel);
+
+    mixLabel.setText("Mix", juce::dontSendNotification);
+    mixLabel.setFont(juce::Font(15.0f, juce::Font::bold));
+    mixLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
+    mixLabel.attachToComponent(&mixSlider, false);
+    mixLabel.setJustificationType(juce::Justification::centred);
+    mixLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
+    mixLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
+    addAndMakeVisible(mixLabel);
+
 
     // Add listener to the slider
     gainSlider.addListener (this);
-
-    
 
     // Start the timer for animation - taken out to stop automatically starting
     //startTimerHz(60); // 60 frames per second
@@ -72,10 +88,15 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
-   // Stop the timer when the editor is destroyed
+   // Clean up slider attachments
+    gainSliderAttachment = nullptr;
+    feedbackSliderAttachment = nullptr;
+    mixSliderAttachment = nullptr;
+
+    // Stop timer if running
     stopTimer();
-   
-   // Remove the listener when the editor is destroyed
+
+    // Remove listener when destroyed
     gainSlider.removeListener(this);
 }
 
@@ -139,28 +160,42 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
 void AudioPluginAudioProcessorEditor::resized()
 {
-    // This is generally where you'll want to lay out the positions of any
-    // subcomponents in your editor..
     // Lay out the positions of subcomponents
+    // Define dimensions and positions for sliders
     int sliderWidth = 100;
-    int sliderHeight = getHeight() - 140;
-    int sliderX = 40;
+    int sliderHeight = 100;
+   
+    // Calculate the center position for the feedback slider
+    int centerX = getWidth() / 2;
     int sliderY = 120;
 
-    gainSlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
+    // Position the feedbackSlider in the center
+    feedbackSlider.setBounds(centerX - (sliderWidth / 2), sliderY, sliderWidth, sliderHeight);
 
-    sliderX += sliderWidth + 50; // Add some space between sliders
+    // Calculate spacing between sliders
+    int sliderSpacing = 30; // Adjust as needed
 
-    delaySlider.setBounds(sliderX, sliderY, sliderWidth, sliderHeight);
+     // Position the gainSlider to the left of the feedbackSlider
+    int gainSliderX = centerX - (sliderWidth / 2) - sliderWidth - sliderSpacing;
+    gainSlider.setBounds(gainSliderX, sliderY, sliderWidth, sliderHeight);
 
-    // Center the gainLabel with the gainSlider
+    // Position the mixSlider to the right of the feedbackSlider
+    int mixSliderX = centerX + (sliderWidth / 2) + sliderSpacing;
+    mixSlider.setBounds(mixSliderX, sliderY, sliderWidth, sliderHeight);
+
+    // Center the labels with the sliders
     int labelWidth = gainSlider.getWidth();
     int labelHeight = 20; // Height of the label
-    int labelX = sliderX;
     int labelY = sliderY - labelHeight - 5; // Position it above the slider with a 5 pixel gap
 
-    gainLabel.setBounds(labelX, labelY, labelWidth, labelHeight);
-    
+    // Center the gainLabel with the gainSlider
+    gainLabel.setBounds(gainSliderX, labelY, labelWidth, labelHeight);
+
+    // Center the feedbackLabel with the feedbackSlider
+    feedbackLabel.setBounds(centerX - (labelWidth / 2), labelY, labelWidth, labelHeight);
+
+    // Center the mixLabel with the mixSlider
+    mixLabel.setBounds(mixSliderX, labelY, labelWidth, labelHeight);
 }
 
 void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)

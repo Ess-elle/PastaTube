@@ -1,8 +1,10 @@
 #pragma once
 
 #include "PluginEditor.h"
+#include "PluginProcessor.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_gui_basics/juce_gui_basics.h"
+#include "failingplugin/CustomLookAndFeel.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor : public juce::AudioProcessorEditor, 
@@ -23,13 +25,22 @@ private:
     // access the processor object that created it.
     
     AudioPluginAudioProcessor& processorRef;
-    juce::Slider gainSlider, delaySlider;
+    juce::Slider gainSlider;
+    juce::Slider feedbackSlider;
+    juce::Slider mixSlider;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
-    juce::Label gainLabel, delayLabel;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> delaySliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> feedbackSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixSliderAttachment;
+    juce::Label gainLabel;
+    juce::Label feedbackLabel;
+    juce::Label mixLabel;
+
 
     juce::ComboBox delayComboBox;
     juce::TextEditor delayTextEditor;
+
+    // Declare custom LookAndFeel
+    std::unique_ptr<CustomLookAndFeel> customLookAndFeel;
     
     
     // Implement the slider listener method
