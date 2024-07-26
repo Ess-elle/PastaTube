@@ -1,5 +1,5 @@
 // CustomLookAndFeel.cpp
-#include "failingplugin/CustomLookAndFeel.h"
+#include "pastaplugin/CustomLookAndFeel.h"
 #include "juce_gui_basics/juce_gui_basics.h"
 
 void CustomLookAndFeel::drawLabel (juce::Graphics& g, juce::Label& label)

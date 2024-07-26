@@ -1,5 +1,5 @@
-#include "failingplugin/PluginProcessor.h"
-#include "failingplugin/PluginEditor.h"
+#include "pastaplugin/PluginProcessor.h"
+#include "pastaplugin/PluginEditor.h"
 
 //==============================================================================
 //CONSTRUCTOR FOR AUDIO PROCESSOR
@@ -14,13 +14,12 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                      #endif
                        ), parameters(*this, nullptr, juce::Identifier("parameters"),
      {
-        std::make_unique<juce::AudioParameterFloat>("gain", "Gain", -60.0f, 12.0f, 0.0f),
-        std::make_unique<juce::AudioParameterFloat>("feedback", "Delay Feedback", 0.0f, 1.0f, 0.35f),
-        std::make_unique<juce::AudioParameterFloat>("mix", "Dry / Wet", 0.0f, 1.0f, 0.5f),
+        std::make_unique<juce::AudioParameterFloat>("input", "Input", -60.0f, 12.0f, 5.0f),
+        std::make_unique<juce::AudioParameterFloat>("drive", "Drive", 0.0f, 10.0f, 5.0f),
+        std::make_unique<juce::AudioParameterFloat>("output", "Output", -60.0f, 12.0f, 5.0f),
      })
 
 {
-
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -94,15 +93,11 @@ void AudioPluginAudioProcessor::changeProgramName (int index, const juce::String
 }
 
 //==============================================================================
-void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void AudioPluginAudioProcessor::prepareToPlay (double /*sampleRate*/, int /*samplesPerBlock*/)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-    int delayMilliseconds = 200;
-    auto delaySamples =(int) std::round (sampleRate * delayMilliseconds / 1000.0);
-    delayBuffer.setSize (2, delaySamples);
-    delayBuffer.clear();
-    delayBufferPos = 0;
+
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -161,45 +156,37 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
 
-    auto* gainParameter = parameters.getRawParameterValue("gain");
-    auto* feedbackParameter = parameters.getRawParameterValue("feedback");
-    auto* mixParameter = parameters.getRawParameterValue("mix");
+    auto* inputParameter = parameters.getRawParameterValue("input");
+    auto* driveParameter = parameters.getRawParameterValue("drive");
+    auto* outputParameter = parameters.getRawParameterValue("output");
 
     // Retrieve the parameter values
-    float gainInDecibels = gainParameter->load();
-    float feedback = feedbackParameter->load();
-    float mix = mixParameter->load();
+    float inputIndB = inputParameter->load();
+    float drive = driveParameter->load();
+    float output = outputParameter->load();
 
     // Convert the gain from decibels to linear
-    float gainInLinear = juce::Decibels::decibelsToGain(gainInDecibels);
-    
-    int delayBufferSize = delayBuffer.getNumSamples();
+    float gainInLinear = juce::Decibels::decibelsToGain(inputIndB);
+    float outputGain = juce::Decibels::decibelsToGain(output);
  
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
     {
-        float* channelData = buffer.getWritePointer (channel);
-        int delayPos = delayBufferPos;
+        auto* channelData = buffer.getWritePointer (channel);
 
         for (int i = 0; i < buffer.getNumSamples(); ++i)
         {
-            float drySample = channelData[i];
+            float cleanSample = channelData[i];
 
-            float delaySample = delayBuffer.getSample (channel, delayPos) * feedback;
-            delayBuffer.setSample (channel, delayPos, drySample + delaySample);
+            // Apply input gain
+            cleanSample *= gainInLinear;
 
-            delayPos++;
-            if (delayPos == delayBufferSize)
-                delayPos = 0;
-
-            channelData[i] = (drySample * (1.0f - mix)) + (delaySample * mix);
-            channelData[i] *= gainInLinear;
+            // Apply drive
+            float saturatedSample = std::tanh(drive * cleanSample);
+            
+            // Apply output gain
+            channelData[i] = saturatedSample * outputGain;
         }
     }
-
-    delayBufferPos += buffer.getNumSamples();
-    if (delayBufferPos >= delayBufferSize)
-        delayBufferPos -= delayBufferSize;
-
 }
 
 //==============================================================================

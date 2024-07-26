@@ -1,5 +1,5 @@
-#include "failingplugin/PluginProcessor.h"
-#include "failingplugin/PluginEditor.h"
+#include "pastaplugin/PluginProcessor.h"
+#include "pastaplugin/PluginEditor.h"
 
 //==============================================================================
 AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
@@ -11,76 +11,76 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // Create an instance of the custom LookAndFeel
     customLookAndFeel = std::make_unique<CustomLookAndFeel>();
 
-    // Initialize gainSlider
-    gainSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
-    gainSlider.setRange(-60.0, 12.0);
-    gainSlider.setValue(0.0);
-    gainSlider.setTextValueSuffix(" dB");
-    gainSlider.setNumDecimalPlacesToDisplay(1);
-    gainSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
-    gainSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
-    gainSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
-    addAndMakeVisible(gainSlider);
+    // Initialise inSlider
+    inSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    inSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
+    inSlider.setRange(-60.0, 12.0);
+    inSlider.setValue(0.0);
+    inSlider.setTextValueSuffix(" dB");
+    inSlider.setNumDecimalPlacesToDisplay(1);
+    inSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    inSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
+    inSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
+    addAndMakeVisible(inSlider);
 
-    // Initialize feedbackSlider
-    feedbackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    feedbackSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
-    feedbackSlider.setRange(0.0, 1.0);
-    feedbackSlider.setValue(0.35);
-    feedbackSlider.setNumDecimalPlacesToDisplay(2);
-    feedbackSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
-    feedbackSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
-    feedbackSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
-    addAndMakeVisible(feedbackSlider);
+    // Initialise driveSlider
+    driveSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    driveSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
+    driveSlider.setRange(0.0, 1.0);
+    driveSlider.setValue(0.35);
+    driveSlider.setNumDecimalPlacesToDisplay(2);
+    driveSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    driveSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
+    driveSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
+    addAndMakeVisible(driveSlider);
 
-    // Initialize mixSlider
-    mixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    mixSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
-    mixSlider.setRange(0.0, 1.0);
-    mixSlider.setValue(0.5);
-    mixSlider.setNumDecimalPlacesToDisplay(2);
-    mixSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
-    mixSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
-    mixSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
-    addAndMakeVisible(mixSlider);
+    // Initialise outSlider
+    outSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    outSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 40);
+    outSlider.setRange(0.0, 1.0);
+    outSlider.setValue(0.5);
+    outSlider.setNumDecimalPlacesToDisplay(2);
+    outSlider.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    outSlider.setColour(juce::Slider::textBoxBackgroundColourId, juce::Colours::indigo);
+    outSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::white);
+    addAndMakeVisible(outSlider);
 
     //attach the slider to the parameter
-    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "gain", gainSlider);
-    feedbackSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "feedback", feedbackSlider);
-    mixSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "mix", mixSlider);
+    inSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "input", inSlider);
+    driveSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "drive", driveSlider);
+    outSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.parameters, "output", outSlider);
 
     // Initialize the labels
-    gainLabel.setText("Gain", juce::dontSendNotification);
-    gainLabel.setFont(juce::Font(15.0f, juce::Font::bold));
-    gainLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
-    gainLabel.attachToComponent(&gainSlider, false);
-    gainLabel.setJustificationType(juce::Justification::centred);
-    gainLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
-    gainLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
-    addAndMakeVisible(gainLabel);
+    inLabel.setText("input", juce::dontSendNotification);
+    inLabel.setFont(juce::Font(15.0f, juce::Font::bold));
+    inLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
+    inLabel.attachToComponent(&inSlider, false);
+    inLabel.setJustificationType(juce::Justification::centred);
+    inLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
+    inLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
+    addAndMakeVisible(inLabel);
 
-    feedbackLabel.setText("Feedback", juce::dontSendNotification);
-    feedbackLabel.setFont(juce::Font(15.0f, juce::Font::bold));
-    feedbackLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
-    feedbackLabel.attachToComponent(&feedbackSlider, false);
-    feedbackLabel.setJustificationType(juce::Justification::centred);
-    feedbackLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
-    feedbackLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
-    addAndMakeVisible(feedbackLabel);
+    driveLabel.setText("drive", juce::dontSendNotification);
+    driveLabel.setFont(juce::Font(15.0f, juce::Font::bold));
+    driveLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
+    driveLabel.attachToComponent(&driveSlider, false);
+    driveLabel.setJustificationType(juce::Justification::centred);
+    driveLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
+    driveLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
+    addAndMakeVisible(driveLabel);
 
-    mixLabel.setText("Mix", juce::dontSendNotification);
-    mixLabel.setFont(juce::Font(15.0f, juce::Font::bold));
-    mixLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
-    mixLabel.attachToComponent(&mixSlider, false);
-    mixLabel.setJustificationType(juce::Justification::centred);
-    mixLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
-    mixLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
-    addAndMakeVisible(mixLabel);
+    outLabel.setText("output", juce::dontSendNotification);
+    outLabel.setFont(juce::Font(15.0f, juce::Font::bold));
+    outLabel.setColour(juce::Label::textColourId, juce::Colours::grey);
+    outLabel.attachToComponent(&outSlider, false);
+    outLabel.setJustificationType(juce::Justification::centred);
+    outLabel.setColour(juce::Label::backgroundColourId, juce::Colours::pink);
+    outLabel.setBorderSize(juce::BorderSize<int>(3)); // Set border size to create rounded edges
+    addAndMakeVisible(outLabel);
 
 
     // Add listener to the slider
-    gainSlider.addListener (this);
+    inSlider.addListener (this);
 
     // Start the timer for animation - taken out to stop automatically starting
     //startTimerHz(60); // 60 frames per second
@@ -89,15 +89,15 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
    // Clean up slider attachments
-    gainSliderAttachment = nullptr;
-    feedbackSliderAttachment = nullptr;
-    mixSliderAttachment = nullptr;
+    inSliderAttachment = nullptr;
+    driveSliderAttachment = nullptr;
+    outSliderAttachment = nullptr;
 
     // Stop timer if running
     stopTimer();
 
     // Remove listener when destroyed
-    gainSlider.removeListener(this);
+    inSlider.removeListener(this);
 }
 
 //==============================================================================
@@ -115,13 +115,13 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     juce::Rectangle<float> backgroundRect = getLocalBounds().toFloat();
     int numWaves = 60;
 
-    // Retrieve the gain value from the processor
-    auto* gainParameter = processorRef.parameters.getRawParameterValue("gain"); //maybe change this
-    float gainInDecibels = gainParameter->load();
-    float gainLinear = juce::Decibels::decibelsToGain(gainInDecibels);
+    // Retrieve the in value from the processor
+    auto* inParameter = processorRef.parameters.getRawParameterValue("in"); //maybe change this
+    float inInDecibels = inParameter->load();
+    float inLinear = juce::Decibels::decibelsToGain(inInDecibels);
 
-    // Use the gain value to adjust the wave amplitude
-    float waveAmplitude = 20.0f * gainLinear;
+    // Use the in value to adjust the wave amplitude
+    float waveAmplitude = 20.0f * inLinear;
     float waveFrequency = 0.05f;
     float lineThickness = 10.0f;
 
@@ -155,7 +155,7 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
     g.setFont(font);
 
     g.setColour(textColour);
-    g.drawFittedText("esselleAudio", textArea, juce::Justification::centred, 1);
+    g.drawFittedText("Pastaaa", textArea, juce::Justification::centred, 1);
 }
 
 void AudioPluginAudioProcessorEditor::resized()
@@ -165,42 +165,42 @@ void AudioPluginAudioProcessorEditor::resized()
     int sliderWidth = 100;
     int sliderHeight = 100;
    
-    // Calculate the center position for the feedback slider
+    // Calculate the center position for the drive slider
     int centerX = getWidth() / 2;
     int sliderY = 120;
 
-    // Position the feedbackSlider in the center
-    feedbackSlider.setBounds(centerX - (sliderWidth / 2), sliderY, sliderWidth, sliderHeight);
+    // Position the driveSlider in the center
+    driveSlider.setBounds(centerX - (sliderWidth / 2), sliderY, sliderWidth, sliderHeight);
 
     // Calculate spacing between sliders
     int sliderSpacing = 30; // Adjust as needed
 
-     // Position the gainSlider to the left of the feedbackSlider
-    int gainSliderX = centerX - (sliderWidth / 2) - sliderWidth - sliderSpacing;
-    gainSlider.setBounds(gainSliderX, sliderY, sliderWidth, sliderHeight);
+     // Position the inSlider to the left of the driveSlider
+    int inSliderX = centerX - (sliderWidth / 2) - sliderWidth - sliderSpacing;
+    inSlider.setBounds(inSliderX, sliderY, sliderWidth, sliderHeight);
 
-    // Position the mixSlider to the right of the feedbackSlider
-    int mixSliderX = centerX + (sliderWidth / 2) + sliderSpacing;
-    mixSlider.setBounds(mixSliderX, sliderY, sliderWidth, sliderHeight);
+    // Position the outSlider to the right of the driveSlider
+    int outSliderX = centerX + (sliderWidth / 2) + sliderSpacing;
+    outSlider.setBounds(outSliderX, sliderY, sliderWidth, sliderHeight);
 
     // Center the labels with the sliders
-    int labelWidth = gainSlider.getWidth();
+    int labelWidth = inSlider.getWidth();
     int labelHeight = 20; // Height of the label
-    int labelY = sliderY - labelHeight - 5; // Position it above the slider with a 5 pixel gap
+    int labelY = sliderY - labelHeight - 5; // Position it above the slider with a 5 pixel p
 
-    // Center the gainLabel with the gainSlider
-    gainLabel.setBounds(gainSliderX, labelY, labelWidth, labelHeight);
+    // Center the inLabel with the inSlider
+    inLabel.setBounds(inSliderX, labelY, labelWidth, labelHeight);
 
-    // Center the feedbackLabel with the feedbackSlider
-    feedbackLabel.setBounds(centerX - (labelWidth / 2), labelY, labelWidth, labelHeight);
+    // Center the driveLabel with the driveSlider
+    driveLabel.setBounds(centerX - (labelWidth / 2), labelY, labelWidth, labelHeight);
 
-    // Center the mixLabel with the mixSlider
-    mixLabel.setBounds(mixSliderX, labelY, labelWidth, labelHeight);
+    // Center the outLabel with the outSlider
+    outLabel.setBounds(outSliderX, labelY, labelWidth, labelHeight);
 }
 
 void AudioPluginAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
 {
-    if (slider == &gainSlider)
+    if (slider == &inSlider)
     {
         // Force a repaint whenever the slider value changes
         repaint();

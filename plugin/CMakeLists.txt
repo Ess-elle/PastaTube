@@ -4,7 +4,7 @@ project(AudioPlugin VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 23)
 
-set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/failingplugin")
+set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include/pastaplugin")
 
 # Add the plugin target
 juce_add_plugin(${PROJECT_NAME}
@@ -15,7 +15,7 @@ juce_add_plugin(${PROJECT_NAME}
     PLUGIN_MANUFACTURER_CODE ESSA
     PLUGIN_CODE AUPL
     FORMATS VST3 Standalone
-    PRODUCT_NAME "failingplugin"
+    PRODUCT_NAME "pastaplugin"
 )
 
 target_sources(${PROJECT_NAME}
@@ -89,9 +89,9 @@ target_compile_definitions(${PROJECT_NAME}_Standalone
         JUCE_WEB_BROWSER=0
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
-        JUCE_APPLICATION_NAME_STRING="failingplugin Standalone"
-        JucePlugin_Name="failingplugin"
-        JucePlugin_Desc="failingplugin Standalone"
+        JUCE_APPLICATION_NAME_STRING="pastaplugin Standalone"
+        JucePlugin_Name="pastaplugin"
+        JucePlugin_Desc="pastaplugin Standalone"
         JucePlugin_Manufacturer="esselleAudio"
         JucePlugin_ManufacturerWebsite="https://www.siobhan-leese.com"
         JucePlugin_ManufacturerEmail="siobhanleese@gmail.com"

@@ -4,7 +4,7 @@
 #include "PluginProcessor.h"
 #include "juce_audio_processors/juce_audio_processors.h"
 #include "juce_gui_basics/juce_gui_basics.h"
-#include "failingplugin/CustomLookAndFeel.h"
+#include "pastaplugin/CustomLookAndFeel.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor : public juce::AudioProcessorEditor, 
@@ -25,19 +25,19 @@ private:
     // access the processor object that created it.
     
     AudioPluginAudioProcessor& processorRef;
-    juce::Slider gainSlider;
-    juce::Slider feedbackSlider;
-    juce::Slider mixSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> feedbackSliderAttachment;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixSliderAttachment;
-    juce::Label gainLabel;
-    juce::Label feedbackLabel;
-    juce::Label mixLabel;
+    juce::Slider inSlider;
+    juce::Slider driveSlider;
+    juce::Slider outSlider;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> inSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> driveSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> outSliderAttachment;
+    juce::Label inLabel;
+    juce::Label driveLabel;
+    juce::Label outLabel;
 
 
-    juce::ComboBox delayComboBox;
-    juce::TextEditor delayTextEditor;
+    //juce::ComboBox delayComboBox;
+    //juce::TextEditor delayTextEditor;
 
     // Declare custom LookAndFeel
     std::unique_ptr<CustomLookAndFeel> customLookAndFeel;
