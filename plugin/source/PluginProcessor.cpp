@@ -14,9 +14,9 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                      #endif
                        ), parameters(*this, nullptr, juce::Identifier("parameters"),
      {
-        std::make_unique<juce::AudioParameterFloat>("input", "Input", -60.0f, 12.0f, 5.0f),
         std::make_unique<juce::AudioParameterFloat>("drive", "Drive", 0.0f, 10.0f, 5.0f),
-        std::make_unique<juce::AudioParameterFloat>("output", "Output", -60.0f, 12.0f, 5.0f),
+        std::make_unique<juce::AudioParameterFloat>("mix", "Dry / Wet", 0.0f, 1.0f, 0.5f),
+        std::make_unique<juce::AudioParameterFloat>("output", "Output", -6.0f, 20.0f, 0.0f),
      })
 
 {
@@ -156,17 +156,16 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // Alternatively, you can process the samples with the channels
     // interleaved by keeping the same state.
 
-    auto* inputParameter = parameters.getRawParameterValue("input");
     auto* driveParameter = parameters.getRawParameterValue("drive");
+    auto* mixParameter = parameters.getRawParameterValue("mix");
     auto* outputParameter = parameters.getRawParameterValue("output");
 
     // Retrieve the parameter values
-    float inputIndB = inputParameter->load();
     float drive = driveParameter->load();
+    float mix = mixParameter->load();
     float output = outputParameter->load();
 
     // Convert the gain from decibels to linear
-    float gainInLinear = juce::Decibels::decibelsToGain(inputIndB);
     float outputGain = juce::Decibels::decibelsToGain(output);
  
     for (int channel = 0; channel < totalNumInputChannels; ++channel)
@@ -177,14 +176,15 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         {
             float cleanSample = channelData[i];
 
-            // Apply input gain
-            cleanSample *= gainInLinear;
-
             // Apply drive
             float saturatedSample = std::tanh(drive * cleanSample);
             
+            //Apply mix before output to ensure final output level is properly controlled
+            float mixedSample = (cleanSample * (1.0f - mix)) + (saturatedSample * mix);
+            
             // Apply output gain
-            channelData[i] = saturatedSample * outputGain;
+            channelData[i] = mixedSample * outputGain;
+
         }
     }
 }

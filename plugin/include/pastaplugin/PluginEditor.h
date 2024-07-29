@@ -25,14 +25,14 @@ private:
     // access the processor object that created it.
     
     AudioPluginAudioProcessor& processorRef;
-    juce::Slider inSlider;
     juce::Slider driveSlider;
+    juce::Slider mixSlider;
     juce::Slider outSlider;
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> inSliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> driveSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixSliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> outSliderAttachment;
-    juce::Label inLabel;
     juce::Label driveLabel;
+    juce::Label mixLabel;
     juce::Label outLabel;
 
 
